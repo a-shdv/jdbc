@@ -1,7 +1,11 @@
 package com.company.jdbc.service.impl;
 
 import com.company.jdbc.dto.ProductDto;
+import com.company.jdbc.entity.Product;
+import com.company.jdbc.exception.ProductNotFoundException;
+import com.company.jdbc.repo.ProductRepo;
 import com.company.jdbc.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,25 +13,32 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+    private final ProductRepo productRepo;
+
     @Override
-    public ProductDto save(ProductDto productDTO) {
-        return null;// TODO not implemented
+    public ProductDto save(ProductDto dto) {
+        productRepo.save(ProductDto.toProduct(dto));
+        return dto;
     }
 
     @Override
     public List<ProductDto> findAll() {
+        List<Product> products = productRepo.findAll();
+        return products.stream().map(ProductDto::toProductDto).toList();
+    }
+
+    @Override
+    public ProductDto findById(UUID id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product with id %s not found".formatted(id)));
+        return ProductDto.toProductDto(product);
+    }
+
+    @Override
+    public ProductDto findByTitle(String title) {
         return null;// TODO not implemented
-    }
-
-    @Override
-    public Optional<ProductDto> findById(UUID id) {
-        return Optional.empty();// TODO not implemented
-    }
-
-    @Override
-    public Optional<ProductDto> findByUsername(String username) {
-        return Optional.empty();// TODO not implemented
     }
 
     @Override
